@@ -109,19 +109,33 @@ Further work could include grouped cross-validation, feature validation, hyperpa
 
 ## Running the Analysis
 
-Install dependencies:
+Clone the repository:
+
+```bash
+git clone https://github.com/SaphyZ95/data-analytics-portfolio.git
+```
+
+Navigate to the ECG project folder:
+
+```bash
+cd data-analytics-portfolio/03-machine-learning/ecg-mi-classification
+```
+
+Install the required Python libraries:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-The improved script uses the two original extracted-feature archives in `data/raw/`. These source archives must be present to regenerate the combined dataset and results.
-
-Run:
+Run the improved analysis:
 
 ```bash
 python src/improved_modelling.py
 ```
+
+The script uses `data/combined_unscaled_features.csv` and evaluates three classification models using patient-separated training and testing data.
+
+Model performance metrics and visualisations are available in the `results/` folder.
 
 ## Disclaimer
 
