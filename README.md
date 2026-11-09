@@ -31,12 +31,24 @@ An interactive business intelligence project analysing sales performance, profit
 
 *Project status: Planned.*
 
-### 3. Predictive Analytics and Machine Learning
-**Tools:** Python, Scikit-learn
+### 3. ECG-Based Myocardial Infarction Classification
 
-Academic machine learning projects exploring predictive modelling, data preprocessing and model evaluation.
+**Tools:** Python, Pandas, Scikit-learn, Matplotlib, Seaborn
 
-*Project status: To be published.*
+A machine-learning project exploring the classification of myocardial infarction (MI) and healthy ECG observations using four extracted ECG features.
+
+Originally developed during my Master of Predictive Analytics, the project was subsequently improved to address patient-level data leakage and evaluate performance on previously unseen patients.
+
+**Key highlights:**
+- Analysed ECG features from 100 patients.
+- Compared Random Forest, SVM and Logistic Regression models.
+- Improved the evaluation methodology using patient-separated training and testing.
+- Achieved 84% patient-level accuracy with Random Forest on one held-out test split.
+- Documented model limitations, performance metrics and visualisations.
+
+**[View ECG Machine Learning Project](03-machine-learning/ecg-mi-classification/)**
+
+**Status:** Portfolio case study published; further validation planned.
 
 ### 4. IT Operations and Reporting
 **Tools:** Microsoft 365, Power Automate, Intune
