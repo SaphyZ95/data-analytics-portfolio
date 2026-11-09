@@ -1,9 +1,8 @@
 """ECG MI classification with patient-disjoint evaluation.
 Run: python src/improved_modelling.py
-Uses the original feature CSV archives (not the previously normalised dataset).
+Uses data/combined_unscaled_features.csv (not the previously normalised dataset).
 """
 from pathlib import Path
-import zipfile
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -23,22 +22,19 @@ RESULTS.mkdir(parents=True, exist_ok=True)
 FEATURES = ['RR Interval (s)', 'HR (bpm)', 'QRS Duration (s)', 'QT Interval (s)']
 
 
-def load_raw_feature_csvs():
-    rows = []
-    for archive, label, prefix in [('PTB_Data_MI_csv.zip', 1, 'MI'), ('PTB_H_control_csv.zip', 0, 'Healthy')]:
-        with zipfile.ZipFile(DATA / 'raw' / archive) as z:
-            names = sorted(n for n in z.namelist() if n.lower().endswith('.csv'))
-            if len(names) != 50:
-                raise ValueError(f'{archive}: expected 50 files, found {len(names)}')
-            for name in names:
-                frame = pd.read_csv(z.open(name))
-                if not set(FEATURES).issubset(frame.columns):
-                    raise ValueError(f'Unexpected columns: {name}: {frame.columns.tolist()}')
-                frame = frame[FEATURES].copy()
-                frame['Patient_ID'] = f'{prefix}_{Path(name).stem}'
-                frame['Label'] = label
-                rows.append(frame)
-    return pd.concat(rows, ignore_index=True)
+def load_combined_features():
+    path = DATA / 'combined_unscaled_features.csv'
+    df = pd.read_csv(path)
+    required = set(FEATURES + ['Patient_ID', 'Label'])
+    missing = required.difference(df.columns)
+    if missing:
+        raise ValueError(f'Missing columns in {path.name}: {sorted(missing)}')
+    patient_labels = df.groupby('Patient_ID')['Label'].nunique()
+    if (patient_labels != 1).any():
+        raise ValueError('One or more patient IDs have inconsistent labels')
+    if df['Patient_ID'].nunique() != 100:
+        raise ValueError(f'Expected 100 patients; found {df["Patient_ID"].nunique()}')
+    return df
 
 
 def metrics(y_true, y_pred, probabilities):
@@ -52,8 +48,7 @@ def metrics(y_true, y_pred, probabilities):
 
 
 def main():
-    df = load_raw_feature_csvs()
-    df.to_csv(DATA / 'combined_unscaled_features.csv', index=False)
+    df = load_combined_features()
     patients = df[['Patient_ID', 'Label']].drop_duplicates().sort_values('Patient_ID')
     train_ids, test_ids = train_test_split(
         patients['Patient_ID'], test_size=0.25, random_state=42,
@@ -98,7 +93,7 @@ def main():
         plt.savefig(RESULTS / f'{name.lower().replace(" ", "_")}_patient_roc.png', dpi=150)
         plt.close()
     pd.DataFrame(results).to_csv(RESULTS / 'metrics.csv', index=False)
-    print('\nSaved combined_unscaled_features.csv, metrics.csv and patient-level plots.')
+    print('\nSaved metrics.csv and patient-level plots.')
     print('Caution: ECG features and their extraction accuracy have not been independently validated; this is an educational analysis, not a clinical diagnostic model.')
 
 
